@@ -1,5 +1,6 @@
 let doveImg;
 let dots = [];
+let fireworkDots = [];
 let state = "expanding";
 let stateTimer = 0;
 let explosionStrength = 0;
@@ -39,6 +40,12 @@ function draw() {
   for (let dot of dots) {
     dot.update(explosionStrength);
     dot.display();
+  }
+
+  for (let i = fireworkDots.length - 1; i >= 0; i--) {
+    fireworkDots[i].update();
+    fireworkDots[i].display();
+    if (fireworkDots[i].alpha <= 0) fireworkDots.splice(i, 1);
   }
 }
 
@@ -110,3 +117,39 @@ function mousePressed() {
   }
 }
 
+function doubleClicked() {
+  let inside = dots.some(dot => dist(mouseX, mouseY, dot.pos.x, dot.pos.y) < 20);
+  if (inside) {
+    for (let i = 0; i < 30; i++) {
+      let angle = random(TWO_PI);
+      let speed = random(4, 8);
+      fireworkDots.push(new FireworkDot(mouseX, mouseY, cos(angle) * speed, sin(angle) * speed));
+    }
+  }
+}
+
+class FireworkDot {
+  constructor(x, y, vx, vy) {
+    this.pos = createVector(x, y);
+    this.vel = createVector(vx, vy);
+    this.alpha = 255;
+    this.color = random([
+      color(255, 120, 120), color(255, 180, 80), color(255, 220, 100),
+      color(120, 220, 255), color(180, 140, 255), color(120, 255, 180),
+      color(255, 160, 200)
+    ]);
+    this.r = random(6, 10);
+  }
+
+  update() {
+    this.pos.add(this.vel);
+    this.vel.y += 0.1;
+    this.vel.mult(0.98);
+    this.alpha -= 3;
+  }
+
+  display() {
+    fill(red(this.color), green(this.color), blue(this.color), this.alpha);
+    ellipse(this.pos.x, this.pos.y, this.r, this.r);
+  }
+}

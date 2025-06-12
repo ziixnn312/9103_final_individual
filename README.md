@@ -67,3 +67,11 @@ I was inspired by the black-and-white artwork in the picture above. The floating
 
 - **ChatGPT:** After building the basic structure, I designed different visual effects and asked ChatGPT to help optimize the code, including features like gathering, explosion, and drag interactions. I also referred to p5.js examples, and when I didn’t fully understand certain parts, I asked ChatGPT to explain them to ensure the logic was clear and everything worked smoothly.
 - **[p5.js](https://p5js.org/):**  I used p5.js as the main tool for drawing, animation, and interaction on the canvas. The official documentation was especially helpful when I needed to understand how certain functions or vector behaviors worked.helped with specific functions and vector behaviors.
+
+
+## Reference
+
+- **[Source of inspiration](https://pin.it/KdKsSQMwF)** 
+- **[p5.js](https://p5js.org/reference/p5/p5.Vector/)** 
+- **[p5.js](https://p5js.org/reference/p5.Vector/dot/)** 
+

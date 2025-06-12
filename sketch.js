@@ -1,23 +1,25 @@
 let doveImg;
-let dots = [];
-let fireworkDots = [];
-let state = "expanding";
-let stateTimer = 0;
-let explosionStrength = 0;
+let dots = [];           // Array to store main particles (dots)
+let fireworkDots = [];   // Array to store firework particles
+let state = "expanding"; // Animation state: expanding / contracting / waiting
+let stateTimer = 0;      // Timer for controlling state transitions
+let explosionStrength = 0; // Controls the intensity of expansion/contraction
 
 function preload() {
+  // Load the dove image before setup starts
   doveImg = loadImage("assets/dovefinal.png");
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  pixelDensity(1);
-  doveImg.resize(1000, 0);
-  doveImg.loadPixels();
+  pixelDensity(1); // Ensure consistent pixel density
+  doveImg.resize(1000, 0); // Resize dove image to fixed width
+  doveImg.loadPixels(); // Load pixel data for color checking
 
   let offsetX = (width - doveImg.width) / 2;
   let offsetY = (height - doveImg.height) / 2;
 
+  // Loop through the dove image and create particles based on dark areas
   for (let y = 0; y < doveImg.height; y += 3) {
     for (let x = 0; x < doveImg.width; x += 3) {
       let i = (x + y * doveImg.width) * 4;
@@ -25,7 +27,7 @@ function setup() {
       if (brightness < 50) {
         let px = x + offsetX + random(-1.5, 1.5);
         let py = y + offsetY + random(-1.5, 1.5);
-        dots.push(new Dot(px, py));
+        dots.push(new Dot(px, py)); // Create a dot if the pixel is dark
       }
     }
   }
@@ -34,26 +36,30 @@ function setup() {
 }
 
 function draw() {
-  background(0);
-  updateState();
+  background(0); // Black background
+  updateState(); // Update animation state
 
+  // Update and display each dot
   for (let dot of dots) {
     dot.update(explosionStrength);
     dot.display();
   }
 
+  // Update and display firework particles
   for (let i = fireworkDots.length - 1; i >= 0; i--) {
     fireworkDots[i].update();
     fireworkDots[i].display();
-    if (fireworkDots[i].alpha <= 0) fireworkDots.splice(i, 1);
+    if (fireworkDots[i].alpha <= 0) fireworkDots.splice(i, 1); // Remove faded dots
   }
 
+  // Text prompt (you can delete this if not needed)
   fill(255);
   textSize(14);
   textAlign(CENTER, BOTTOM);
   text("Click to color • Double click for fireworks", width / 2, height - 20);
 }
 
+// Controls the three-phase animation cycle
 function updateState() {
   stateTimer++;
   if (state === "expanding") {
@@ -70,26 +76,32 @@ function updateState() {
   }
 }
 
+// Class for each particle that forms the dove
 class Dot {
   constructor(x, y) {
-    this.origin = createVector(x, y);
-    this.pos = this.origin.copy();
-    this.vel = p5.Vector.random2D().mult(random(3));
-    this.size = createVector(random(3.5, 5), random(2, 3.5));
-    this.gray = random(80, 200);
+    this.origin = createVector(x, y);    // Initial target position
+    this.pos = this.origin.copy();       // Current position
+    this.vel = p5.Vector.random2D().mult(random(3)); // Random initial velocity
+    this.size = createVector(random(3.5, 5), random(2, 3.5)); // Random size
+    this.gray = random(80, 200);         // Gray tone
     this.defaultColor = color(this.gray);
     this.color = this.defaultColor;
-    this.isColorful = false;
-    this.colorLifespan = 0;
+    this.isColorful = false;             // Is temporarily colored
+    this.colorLifespan = 0;              // Time before fading back to gray
   }
 
   update(strength) {
+    // Particle moves away from origin (expansion)
     let push = p5.Vector.sub(this.pos, this.origin).normalize().mult(strength);
+    // Particle is pulled back to origin (contraction)
     let pull = p5.Vector.sub(this.origin, this.pos).mult(0.05);
     this.vel.add(push).add(pull).mult(0.9);
-    if (state === "waiting") this.pos.add(p5.Vector.random2D().mult(0.3));
+    if (state === "waiting") {
+      this.pos.add(p5.Vector.random2D().mult(0.3)); // Small jitter during waiting state
+    }
     this.pos.add(this.vel);
 
+    // Handle color fading if clicked
     if (this.isColorful) {
       this.colorLifespan--;
       if (this.colorLifespan > 0) {
@@ -108,6 +120,7 @@ class Dot {
   }
 }
 
+// Click to temporarily change color of nearby particles
 function mousePressed() {
   for (let dot of dots) {
     if (dist(mouseX, mouseY, dot.pos.x, dot.pos.y) < 20) {
@@ -122,6 +135,7 @@ function mousePressed() {
   }
 }
 
+// Double-click to trigger fireworks from dove shape
 function doubleClicked() {
   let inside = dots.some(dot => dist(mouseX, mouseY, dot.pos.x, dot.pos.y) < 20);
   if (inside) {
@@ -133,6 +147,7 @@ function doubleClicked() {
   }
 }
 
+// Firework particle class
 class FireworkDot {
   constructor(x, y, vx, vy) {
     this.pos = createVector(x, y);
@@ -148,9 +163,9 @@ class FireworkDot {
 
   update() {
     this.pos.add(this.vel);
-    this.vel.y += 0.1;
-    this.vel.mult(0.98);
-    this.alpha -= 3;
+    this.vel.y += 0.1; // Gravity
+    this.vel.mult(0.98); // Friction
+    this.alpha -= 3; // Fade out
   }
 
   display() {

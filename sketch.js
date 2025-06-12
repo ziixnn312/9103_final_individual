@@ -67,6 +67,8 @@ class Dot {
     this.gray = random(80, 200);
     this.defaultColor = color(this.gray);
     this.color = this.defaultColor;
+    this.isColorful = false;
+    this.colorLifespan = 0;
   }
 
   update(strength) {
@@ -75,6 +77,16 @@ class Dot {
     this.vel.add(push).add(pull).mult(0.9);
     if (state === "waiting") this.pos.add(p5.Vector.random2D().mult(0.3));
     this.pos.add(this.vel);
+
+    if (this.isColorful) {
+      this.colorLifespan--;
+      if (this.colorLifespan > 0) {
+        this.color = lerpColor(this.color, this.defaultColor, 0.05);
+      } else {
+        this.isColorful = false;
+        this.color = this.defaultColor;
+      }
+    }
   }
 
   display() {
@@ -83,3 +95,18 @@ class Dot {
     ellipse(this.pos.x, this.pos.y, this.size.x, this.size.y);
   }
 }
+
+function mousePressed() {
+  for (let dot of dots) {
+    if (dist(mouseX, mouseY, dot.pos.x, dot.pos.y) < 20) {
+      dot.isColorful = true;
+      dot.colorLifespan = 80;
+      dot.color = color(
+        random([255, 255, random(200, 255), random(100, 180)]),
+        random([255, 255, random(200, 255), random(100, 180)]),
+        random([255, 255, random(200, 255), random(100, 180)])
+      );
+    }
+  }
+}
+

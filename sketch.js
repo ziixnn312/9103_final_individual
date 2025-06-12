@@ -47,6 +47,11 @@ function draw() {
     fireworkDots[i].display();
     if (fireworkDots[i].alpha <= 0) fireworkDots.splice(i, 1);
   }
+
+  fill(255);
+  textSize(14);
+  textAlign(CENTER, BOTTOM);
+  text("Click to color • Double click for fireworks", width / 2, height - 20);
 }
 
 function updateState() {

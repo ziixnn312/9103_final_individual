@@ -1,6 +1,8 @@
 let doveImg;
 let dots = [];
-let t = 0;
+let state = "expanding";
+let stateTimer = 0;
+let explosionStrength = 0;
 
 function preload() {
   doveImg = loadImage("assets/dovefinal.png");
@@ -28,17 +30,31 @@ function setup() {
   }
 
   noStroke();
-  fill(0);
 }
 
 function draw() {
-  background(255);
-  let explosionStrength = sin(t) * 3;
-  t += 0.02;
+  background(0);
+  updateState();
 
   for (let dot of dots) {
     dot.update(explosionStrength);
     dot.display();
+  }
+}
+
+function updateState() {
+  stateTimer++;
+  if (state === "expanding") {
+    explosionStrength = min(explosionStrength + 0.08, 5);
+    if (explosionStrength === 5) state = "contracting";
+  } else if (state === "contracting") {
+    explosionStrength = max(explosionStrength - 0.12, 1);
+    if (explosionStrength === 1) {
+      state = "waiting";
+      stateTimer = 0;
+    }
+  } else if (state === "waiting" && stateTimer > 15) {
+    state = "expanding";
   }
 }
 
@@ -47,16 +63,23 @@ class Dot {
     this.origin = createVector(x, y);
     this.pos = this.origin.copy();
     this.vel = p5.Vector.random2D().mult(random(3));
+    this.size = createVector(random(3.5, 5), random(2, 3.5));
+    this.gray = random(80, 200);
+    this.defaultColor = color(this.gray);
+    this.color = this.defaultColor;
   }
 
   update(strength) {
     let push = p5.Vector.sub(this.pos, this.origin).normalize().mult(strength);
     let pull = p5.Vector.sub(this.origin, this.pos).mult(0.05);
     this.vel.add(push).add(pull).mult(0.9);
+    if (state === "waiting") this.pos.add(p5.Vector.random2D().mult(0.3));
     this.pos.add(this.vel);
   }
 
   display() {
-    ellipse(this.pos.x, this.pos.y, 3, 3);
+    let alpha = 150 + 100 * sin(10 + frameCount * 0.02 + this.pos.y * 0.005);
+    fill(red(this.color), green(this.color), blue(this.color), alpha);
+    ellipse(this.pos.x, this.pos.y, this.size.x, this.size.y);
   }
 }

@@ -72,6 +72,6 @@ I was inspired by the black-and-white artwork in the picture above. The floating
 ## Reference
 
 - **[Source of inspiration](https://pin.it/KdKsSQMwF)** 
-- **[p5.js](https://p5js.org/reference/p5/p5.Vector/)** 
-- **[p5.js](https://p5js.org/reference/p5.Vector/dot/)** 
+- **[p5.Vector](https://p5js.org/reference/p5/p5.Vector/)** 
+- **[p5.dot()](https://p5js.org/reference/p5.Vector/dot/)** 
 
